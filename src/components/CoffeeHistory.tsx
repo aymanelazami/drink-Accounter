@@ -1,26 +1,23 @@
 
 import React from 'react';
-import { formatDate, CoffeeEntry } from '@/utils/coffeeUtils';
+import { formatDate, DrinkEntry, getDrinkName } from '@/utils/coffeeUtils';
 import { motion } from 'framer-motion';
 
-interface CoffeeHistoryProps {
-  entries: CoffeeEntry[];
+interface DrinkHistoryProps {
+  entries: DrinkEntry[];
 }
 
-const CoffeeHistory: React.FC<CoffeeHistoryProps> = ({ entries }) => {
-  if (entries.length <= 1) {
+const DrinkHistory: React.FC<DrinkHistoryProps> = ({ entries }) => {
+  if (entries.length === 0) {
     return (
       <div className="glass rounded-3xl p-6 subtle-shadow text-center">
         <p className="text-muted-foreground text-sm">
-          Your coffee history will appear here after you add more coffees.
+          Your drink history will appear here after you add drinks.
         </p>
       </div>
     );
   }
   
-  // Skip the first entry as it's the current total
-  const historyEntries = entries.slice(1);
-
   return (
     <div className="glass rounded-3xl p-6 subtle-shadow">
       <h3 className="text-sm font-medium mb-4 text-muted-foreground uppercase tracking-wide">
@@ -28,8 +25,12 @@ const CoffeeHistory: React.FC<CoffeeHistoryProps> = ({ entries }) => {
       </h3>
       
       <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
-        {historyEntries.map((entry, index) => {
+        {entries.map((entry, index) => {
           const isLatest = index === 0;
+          const drinkName = getDrinkName(entry.type);
+          const bgColor = entry.type === 'coffee' ? 
+            (isLatest ? 'bg-coffee-dark animate-pulse-soft' : 'bg-coffee-light') : 
+            (isLatest ? 'bg-orange-500 animate-pulse-soft' : 'bg-orange-300');
           
           return (
             <div 
@@ -38,10 +39,9 @@ const CoffeeHistory: React.FC<CoffeeHistoryProps> = ({ entries }) => {
                       ${isLatest ? 'bg-secondary/50' : 'hover:bg-secondary/30'}`}
             >
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-3 
-                               ${isLatest ? 'bg-coffee-dark animate-pulse-soft' : 'bg-coffee-light'}`} />
+                <div className={`w-2 h-2 rounded-full mr-3 ${bgColor}`} />
                 <div>
-                  <div className="text-sm font-medium">Coffee #{entry.count}</div>
+                  <div className="text-sm font-medium">{drinkName} #{entry.count}</div>
                   <div className="text-xs text-muted-foreground">{formatDate(entry.timestamp)}</div>
                 </div>
               </div>
@@ -54,4 +54,4 @@ const CoffeeHistory: React.FC<CoffeeHistoryProps> = ({ entries }) => {
   );
 };
 
-export default CoffeeHistory;
+export default DrinkHistory;

@@ -3,7 +3,7 @@ import React from 'react';
 import CoffeeCounter from '@/components/CoffeeCounter';
 import CoffeeHistory from '@/components/CoffeeHistory';
 import CoffeeStats from '@/components/CoffeeStats';
-import { useCoffeeData } from '@/utils/coffeeUtils';
+import { useDrinkData } from '@/utils/coffeeUtils';
 import { Button } from '@/components/ui/button';
 import { RotateCcwIcon } from 'lucide-react';
 import {
@@ -19,21 +19,26 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Index = () => {
-  const { coffeeData, coffeeStats, addCoffee, resetData } = useCoffeeData();
+  const { drinkData, coffeeStats, juiceStats, totalStats, addDrink, resetData } = useDrinkData();
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-accent/50 to-background">
       {/* Header */}
       <header className="w-full py-6 mb-4 px-6">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             <div className="text-xl font-medium tracking-tight">Daily Brew</div>
-            <div className="ml-2 px-2 py-1 bg-coffee-light/20 rounded-full text-xs text-coffee-dark">
-              8 DHS
+            <div className="flex items-center space-x-2">
+              <div className="px-2 py-1 bg-coffee-light/20 rounded-full text-xs text-coffee-dark">
+                Coffee: 8 DHS
+              </div>
+              <div className="px-2 py-1 bg-orange-300/30 rounded-full text-xs text-orange-600">
+                Juice: 12 DHS
+              </div>
             </div>
           </div>
           
-          {coffeeData.length > 0 && (
+          {drinkData.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -42,9 +47,9 @@ const Index = () => {
               </AlertDialogTrigger>
               <AlertDialogContent className="glass">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Reset coffee counter?</AlertDialogTitle>
+                  <AlertDialogTitle>Reset drink counter?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will delete all your coffee history. This action cannot be undone.
+                    This will delete all your drink history. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -64,17 +69,18 @@ const Index = () => {
           {/* Main counter */}
           <div className="animate-fade-in">
             <CoffeeCounter 
-              count={coffeeStats.count} 
-              totalSpent={coffeeStats.totalSpent} 
-              onAddCoffee={addCoffee} 
+              coffeeCount={coffeeStats.count} 
+              juiceCount={juiceStats.count}
+              totalSpent={totalStats.totalSpent} 
+              onAddDrink={addDrink} 
             />
           </div>
           
           {/* Stats and history section */}
           <div className="grid md:grid-cols-2 gap-6 animate-fade-up" 
                style={{ animationDelay: '0.2s' }}>
-            <CoffeeStats entries={coffeeData} />
-            <CoffeeHistory entries={coffeeData} />
+            <CoffeeStats entries={drinkData} />
+            <CoffeeHistory entries={drinkData} />
           </div>
         </div>
       </main>

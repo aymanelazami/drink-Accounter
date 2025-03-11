@@ -1,23 +1,29 @@
 
 import React from 'react';
-import { CoffeeEntry, COFFEE_PRICE } from '@/utils/coffeeUtils';
+import { DrinkEntry, COFFEE_PRICE, JUICE_PRICE } from '@/utils/coffeeUtils';
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-interface CoffeeStatsProps {
-  entries: CoffeeEntry[];
+interface DrinkStatsProps {
+  entries: DrinkEntry[];
 }
 
-const CoffeeStats: React.FC<CoffeeStatsProps> = ({ entries }) => {
+const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
   // If no entries yet, show empty state
   if (entries.length === 0) {
     return null;
   }
 
-  const totalCoffees = entries[0]?.count || 0;
-  const totalSpent = entries[0]?.totalSpent || 0;
+  // Separate entries by type
+  const coffeeEntries = entries.filter(entry => entry.type === 'coffee');
+  const juiceEntries = entries.filter(entry => entry.type === 'juice');
   
-  // Calculate average consumption (weekly if enough data)
+  const totalCoffees = coffeeEntries.length > 0 ? coffeeEntries[0].count : 0;
+  const totalJuices = juiceEntries.length > 0 ? juiceEntries[0].count : 0;
+  const totalSpent = (coffeeEntries.length > 0 ? coffeeEntries[0].totalSpent : 0) + 
+                    (juiceEntries.length > 0 ? juiceEntries[0].totalSpent : 0);
+  
+  // Calculate average consumption
   const hasEnoughData = entries.length > 5;
   const oldestEntryTimestamp = entries[entries.length - 1]?.timestamp;
   const newestEntryTimestamp = entries[0]?.timestamp;
@@ -27,30 +33,50 @@ const CoffeeStats: React.FC<CoffeeStatsProps> = ({ entries }) => {
   
   if (hasEnoughData && oldestEntryTimestamp) {
     const daysDifference = (newestEntryTimestamp - oldestEntryTimestamp) / (1000 * 60 * 60 * 24);
-    averagePerDay = daysDifference > 0 ? totalCoffees / daysDifference : totalCoffees;
+    averagePerDay = daysDifference > 0 ? (totalCoffees + totalJuices) / daysDifference : (totalCoffees + totalJuices);
     
     if (averagePerDay < 1) {
-      message = `About ${(averagePerDay * 7).toFixed(1)} coffees per week`;
+      message = `About ${(averagePerDay * 7).toFixed(1)} drinks per week`;
     } else if (averagePerDay < 2) {
-      message = `About ${averagePerDay.toFixed(1)} coffees per day`;
+      message = `About ${averagePerDay.toFixed(1)} drinks per day`;
     } else {
-      message = `About ${averagePerDay.toFixed(1)} coffees per day`;
+      message = `About ${averagePerDay.toFixed(1)} drinks per day`;
     }
   } else {
-    message = 'Add more coffees to see your consumption patterns';
+    message = 'Add more drinks to see your consumption patterns';
   }
 
-  // Prepare chart data - last 7 entries (excluding current total)
-  const chartData = entries.slice(1, 8).map(entry => ({
-    name: new Date(entry.timestamp).toLocaleDateString('en-US', { weekday: 'short' }),
-    count: entry.count,
-    amount: entry.totalSpent
-  })).reverse();
+  // Prepare chart data
+  // Group by day for the last 7 days
+  const last7Days = new Map();
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
+    last7Days.set(dayStr, { name: dayStr, coffee: 0, juice: 0 });
+  }
+  
+  // Fill in the data
+  entries.forEach(entry => {
+    const date = new Date(entry.timestamp);
+    const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
+    if (last7Days.has(dayStr)) {
+      const dayData = last7Days.get(dayStr);
+      if (entry.type === 'coffee') {
+        dayData.coffee += COFFEE_PRICE;
+      } else {
+        dayData.juice += JUICE_PRICE;
+      }
+    }
+  });
+  
+  const chartData = Array.from(last7Days.values()).reverse();
 
   return (
     <div className="glass rounded-3xl p-6 subtle-shadow">
       <h3 className="text-sm font-medium mb-4 text-muted-foreground uppercase tracking-wide">
-        Your Coffee Stats
+        Your Drink Stats
       </h3>
       
       <div className="grid grid-cols-2 gap-3 mb-4">
@@ -68,10 +94,10 @@ const CoffeeStats: React.FC<CoffeeStatsProps> = ({ entries }) => {
         </Card>
       </div>
       
-      {chartData.length > 1 && (
+      {chartData.some(day => day.coffee > 0 || day.juice > 0) && (
         <div className="h-36 mt-6">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <BarChart data={chartData} stackOffset="sign">
               <XAxis 
                 dataKey="name" 
                 tick={{ fontSize: 10 }}
@@ -89,12 +115,20 @@ const CoffeeStats: React.FC<CoffeeStatsProps> = ({ entries }) => {
                   border: 'none',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
                 }}
-                formatter={(value: any) => [`${value} DHS`, 'Amount']}
-                labelFormatter={(label) => `${label}`}
+                formatter={(value: any) => [`${value} DHS`, '']}
+              />
+              <Legend />
+              <Bar 
+                dataKey="coffee" 
+                name="Coffee"
+                fill="#8B6E4F" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
               />
               <Bar 
-                dataKey="amount" 
-                fill="#8B6E4F" 
+                dataKey="juice" 
+                name="Orange Juice"
+                fill="#F97316" 
                 radius={[4, 4, 0, 0]}
                 animationDuration={1500}
               />
@@ -106,4 +140,4 @@ const CoffeeStats: React.FC<CoffeeStatsProps> = ({ entries }) => {
   );
 };
 
-export default CoffeeStats;
+export default DrinkStats;
