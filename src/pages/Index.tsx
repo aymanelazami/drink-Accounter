@@ -19,7 +19,17 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Index = () => {
-  const { drinkData, coffeeStats, juiceStats, totalStats, addDrink, resetData } = useDrinkData();
+  const { 
+    drinkData, 
+    coffeeStats, 
+    juiceStats, 
+    coffeeCreamStats,
+    coffeePrestigeStats,
+    sodaStats,
+    totalStats, 
+    addDrink, 
+    resetData 
+  } = useDrinkData();
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-accent/50 to-background">
@@ -28,12 +38,21 @@ const Index = () => {
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="text-xl font-medium tracking-tight">Daily Brew</div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="px-2 py-1 bg-coffee-light/20 rounded-full text-xs text-coffee-dark">
                 Coffee: 8 DHS
               </div>
+              <div className="px-2 py-1 bg-amber-500/20 rounded-full text-xs text-amber-600">
+                Coffee w/Cream: 10 DHS
+              </div>
+              <div className="px-2 py-1 bg-amber-700/20 rounded-full text-xs text-amber-700">
+                Coffee Prestige: 10 DHS
+              </div>
               <div className="px-2 py-1 bg-orange-300/30 rounded-full text-xs text-orange-600">
                 Juice: 12 DHS
+              </div>
+              <div className="px-2 py-1 bg-red-300/30 rounded-full text-xs text-red-600">
+                Soda: 12 DHS
               </div>
             </div>
           </div>

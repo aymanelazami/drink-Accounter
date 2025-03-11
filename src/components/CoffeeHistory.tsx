@@ -28,9 +28,28 @@ const DrinkHistory: React.FC<DrinkHistoryProps> = ({ entries }) => {
         {entries.map((entry, index) => {
           const isLatest = index === 0;
           const drinkName = getDrinkName(entry.type);
-          const bgColor = entry.type === 'coffee' ? 
-            (isLatest ? 'bg-coffee-dark animate-pulse-soft' : 'bg-coffee-light') : 
-            (isLatest ? 'bg-orange-500 animate-pulse-soft' : 'bg-orange-300');
+          
+          // Define background colors based on drink type
+          let bgColor;
+          switch(entry.type) {
+            case 'coffee':
+              bgColor = isLatest ? 'bg-coffee-dark animate-pulse-soft' : 'bg-coffee-light';
+              break;
+            case 'juice':
+              bgColor = isLatest ? 'bg-orange-500 animate-pulse-soft' : 'bg-orange-300';
+              break;
+            case 'coffee-cream':
+              bgColor = isLatest ? 'bg-amber-500 animate-pulse-soft' : 'bg-amber-300';
+              break;
+            case 'coffee-prestige':
+              bgColor = isLatest ? 'bg-amber-700 animate-pulse-soft' : 'bg-amber-600';
+              break;
+            case 'soda':
+              bgColor = isLatest ? 'bg-red-500 animate-pulse-soft' : 'bg-red-300';
+              break;
+            default:
+              bgColor = isLatest ? 'bg-gray-500 animate-pulse-soft' : 'bg-gray-300';
+          }
           
           return (
             <div 

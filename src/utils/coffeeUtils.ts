@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react';
 // Prices in DHS
 export const COFFEE_PRICE = 8;
 export const JUICE_PRICE = 12;
+export const COFFEE_CREAM_PRICE = 10;
+export const COFFEE_PRESTIGE_PRICE = 10;
+export const SODA_PRICE = 12;
 
 // Drink types
-export type DrinkType = 'coffee' | 'juice';
+export type DrinkType = 'coffee' | 'juice' | 'coffee-cream' | 'coffee-prestige' | 'soda';
 
 // Define types for our drink entries
 export interface DrinkEntry {
@@ -42,7 +45,7 @@ export const saveDrinkData = (data: DrinkEntry[]): void => {
 
 // Add a new drink entry
 export const addDrinkEntry = (currentEntries: DrinkEntry[], type: DrinkType): DrinkEntry[] => {
-  const price = type === 'coffee' ? COFFEE_PRICE : JUICE_PRICE;
+  const price = getDrinkPrice(type);
   
   // Get the latest count for this type of drink
   const lastEntryOfType = currentEntries.find(entry => entry.type === type);
@@ -78,12 +81,38 @@ export const formatDate = (timestamp: number): string => {
 
 // Get the drink name for display
 export const getDrinkName = (type: DrinkType): string => {
-  return type === 'coffee' ? 'Coffee' : 'Orange Juice';
+  switch (type) {
+    case 'coffee':
+      return 'Coffee';
+    case 'juice':
+      return 'Orange Juice';
+    case 'coffee-cream':
+      return 'Coffee with Cream';
+    case 'coffee-prestige':
+      return 'Coffee Prestige';
+    case 'soda':
+      return 'Soda';
+    default:
+      return 'Unknown Drink';
+  }
 };
 
 // Get drink price
 export const getDrinkPrice = (type: DrinkType): number => {
-  return type === 'coffee' ? COFFEE_PRICE : JUICE_PRICE;
+  switch (type) {
+    case 'coffee':
+      return COFFEE_PRICE;
+    case 'juice':
+      return JUICE_PRICE;
+    case 'coffee-cream':
+      return COFFEE_CREAM_PRICE;
+    case 'coffee-prestige':
+      return COFFEE_PRESTIGE_PRICE;
+    case 'soda':
+      return SODA_PRICE;
+    default:
+      return 0;
+  }
 };
 
 // Custom hook for drink data
@@ -117,6 +146,9 @@ export const useDrinkData = () => {
   // Get stats for each drink type
   const coffeeEntries = drinkData.filter(entry => entry.type === 'coffee');
   const juiceEntries = drinkData.filter(entry => entry.type === 'juice');
+  const coffeeCreamEntries = drinkData.filter(entry => entry.type === 'coffee-cream');
+  const coffeePrestigeEntries = drinkData.filter(entry => entry.type === 'coffee-prestige');
+  const sodaEntries = drinkData.filter(entry => entry.type === 'soda');
   
   const coffeeStats = {
     count: coffeeEntries.length > 0 ? coffeeEntries[0].count : 0,
@@ -128,15 +160,33 @@ export const useDrinkData = () => {
     totalSpent: juiceEntries.length > 0 ? juiceEntries[0].totalSpent : 0
   };
   
+  const coffeeCreamStats = {
+    count: coffeeCreamEntries.length > 0 ? coffeeCreamEntries[0].count : 0,
+    totalSpent: coffeeCreamEntries.length > 0 ? coffeeCreamEntries[0].totalSpent : 0
+  };
+  
+  const coffeePrestigeStats = {
+    count: coffeePrestigeEntries.length > 0 ? coffeePrestigeEntries[0].count : 0,
+    totalSpent: coffeePrestigeEntries.length > 0 ? coffeePrestigeEntries[0].totalSpent : 0
+  };
+  
+  const sodaStats = {
+    count: sodaEntries.length > 0 ? sodaEntries[0].count : 0,
+    totalSpent: sodaEntries.length > 0 ? sodaEntries[0].totalSpent : 0
+  };
+  
   const totalStats = {
-    count: coffeeStats.count + juiceStats.count,
-    totalSpent: coffeeStats.totalSpent + juiceStats.totalSpent
+    count: coffeeStats.count + juiceStats.count + coffeeCreamStats.count + coffeePrestigeStats.count + sodaStats.count,
+    totalSpent: coffeeStats.totalSpent + juiceStats.totalSpent + coffeeCreamStats.totalSpent + coffeePrestigeStats.totalSpent + sodaStats.totalSpent
   };
   
   return { 
     drinkData, 
     coffeeStats, 
-    juiceStats, 
+    juiceStats,
+    coffeeCreamStats,
+    coffeePrestigeStats,
+    sodaStats,
     totalStats,
     addDrink,
     resetData, 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DrinkEntry, COFFEE_PRICE, JUICE_PRICE } from '@/utils/coffeeUtils';
+import { DrinkEntry, COFFEE_PRICE, JUICE_PRICE, COFFEE_CREAM_PRICE, COFFEE_PRESTIGE_PRICE, SODA_PRICE } from '@/utils/coffeeUtils';
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
@@ -17,11 +17,23 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
   // Separate entries by type
   const coffeeEntries = entries.filter(entry => entry.type === 'coffee');
   const juiceEntries = entries.filter(entry => entry.type === 'juice');
+  const coffeeCreamEntries = entries.filter(entry => entry.type === 'coffee-cream');
+  const coffeePrestigeEntries = entries.filter(entry => entry.type === 'coffee-prestige');
+  const sodaEntries = entries.filter(entry => entry.type === 'soda');
   
   const totalCoffees = coffeeEntries.length > 0 ? coffeeEntries[0].count : 0;
   const totalJuices = juiceEntries.length > 0 ? juiceEntries[0].count : 0;
+  const totalCoffeeCream = coffeeCreamEntries.length > 0 ? coffeeCreamEntries[0].count : 0;
+  const totalCoffeePrestige = coffeePrestigeEntries.length > 0 ? coffeePrestigeEntries[0].count : 0;
+  const totalSodas = sodaEntries.length > 0 ? sodaEntries[0].count : 0;
+  
+  const totalDrinks = totalCoffees + totalJuices + totalCoffeeCream + totalCoffeePrestige + totalSodas;
+  
   const totalSpent = (coffeeEntries.length > 0 ? coffeeEntries[0].totalSpent : 0) + 
-                    (juiceEntries.length > 0 ? juiceEntries[0].totalSpent : 0);
+                     (juiceEntries.length > 0 ? juiceEntries[0].totalSpent : 0) +
+                     (coffeeCreamEntries.length > 0 ? coffeeCreamEntries[0].totalSpent : 0) +
+                     (coffeePrestigeEntries.length > 0 ? coffeePrestigeEntries[0].totalSpent : 0) +
+                     (sodaEntries.length > 0 ? sodaEntries[0].totalSpent : 0);
   
   // Calculate average consumption
   const hasEnoughData = entries.length > 5;
@@ -33,7 +45,7 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
   
   if (hasEnoughData && oldestEntryTimestamp) {
     const daysDifference = (newestEntryTimestamp - oldestEntryTimestamp) / (1000 * 60 * 60 * 24);
-    averagePerDay = daysDifference > 0 ? (totalCoffees + totalJuices) / daysDifference : (totalCoffees + totalJuices);
+    averagePerDay = daysDifference > 0 ? totalDrinks / daysDifference : totalDrinks;
     
     if (averagePerDay < 1) {
       message = `About ${(averagePerDay * 7).toFixed(1)} drinks per week`;
@@ -54,7 +66,7 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
     const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
-    last7Days.set(dayStr, { name: dayStr, coffee: 0, juice: 0 });
+    last7Days.set(dayStr, { name: dayStr, coffee: 0, juice: 0, coffeeCream: 0, coffeePrestige: 0, soda: 0 });
   }
   
   // Fill in the data
@@ -65,8 +77,14 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
       const dayData = last7Days.get(dayStr);
       if (entry.type === 'coffee') {
         dayData.coffee += COFFEE_PRICE;
-      } else {
+      } else if (entry.type === 'juice') {
         dayData.juice += JUICE_PRICE;
+      } else if (entry.type === 'coffee-cream') {
+        dayData.coffeeCream += COFFEE_CREAM_PRICE;
+      } else if (entry.type === 'coffee-prestige') {
+        dayData.coffeePrestige += COFFEE_PRESTIGE_PRICE;
+      } else if (entry.type === 'soda') {
+        dayData.soda += SODA_PRICE;
       }
     }
   });
@@ -94,7 +112,7 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
         </Card>
       </div>
       
-      {chartData.some(day => day.coffee > 0 || day.juice > 0) && (
+      {chartData.some(day => day.coffee > 0 || day.juice > 0 || day.coffeeCream > 0 || day.coffeePrestige > 0 || day.soda > 0) && (
         <div className="h-36 mt-6">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} stackOffset="sign">
@@ -126,9 +144,30 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
                 animationDuration={1500}
               />
               <Bar 
+                dataKey="coffeeCream" 
+                name="Coffee with Cream"
+                fill="#D9A566" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
+              />
+              <Bar 
+                dataKey="coffeePrestige" 
+                name="Coffee Prestige"
+                fill="#8B5A2B" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
+              />
+              <Bar 
                 dataKey="juice" 
                 name="Orange Juice"
                 fill="#F97316" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={1500}
+              />
+              <Bar 
+                dataKey="soda" 
+                name="Soda"
+                fill="#EF4444" 
                 radius={[4, 4, 0, 0]}
                 animationDuration={1500}
               />
