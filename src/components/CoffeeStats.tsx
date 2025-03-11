@@ -92,28 +92,28 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
   const chartData = Array.from(last7Days.values()).reverse();
 
   return (
-    <div className="glass rounded-3xl p-6 subtle-shadow">
+    <div className="glass rounded-3xl p-4 sm:p-6 subtle-shadow">
       <h3 className="text-sm font-medium mb-4 text-muted-foreground uppercase tracking-wide">
         Your Drink Stats
       </h3>
       
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
         <Card className="bg-secondary/50 border-0">
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="text-xs text-muted-foreground mb-1">Monthly Spending</div>
-            <div className="text-2xl font-light">{totalSpent} DHS</div>
+            <div className="text-xl sm:text-2xl font-light">{totalSpent} DHS</div>
           </CardContent>
         </Card>
         <Card className="bg-secondary/50 border-0">
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="text-xs text-muted-foreground mb-1">Consumption</div>
-            <div className="text-sm font-medium">{message}</div>
+            <div className="text-xs sm:text-sm font-medium">{message}</div>
           </CardContent>
         </Card>
       </div>
       
       {chartData.some(day => day.coffee > 0 || day.juice > 0 || day.coffeeCream > 0 || day.coffeePrestige > 0 || day.soda > 0) && (
-        <div className="h-36 mt-6">
+        <div className="h-32 sm:h-36 mt-4 sm:mt-6">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} stackOffset="sign">
               <XAxis 
@@ -123,7 +123,7 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
                 tickLine={false}
               />
               <YAxis 
-                hide={true} 
+                hide 
                 domain={[0, 'dataMax + 5']}
               />
               <Tooltip 
@@ -135,7 +135,7 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
                 }}
                 formatter={(value: any) => [`${value} DHS`, '']}
               />
-              <Legend />
+              <Legend iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
               <Bar 
                 dataKey="coffee" 
                 name="Coffee"
@@ -145,7 +145,7 @@ const DrinkStats: React.FC<DrinkStatsProps> = ({ entries }) => {
               />
               <Bar 
                 dataKey="coffeeCream" 
-                name="Coffee with Cream"
+                name="Coffee w/Cream"
                 fill="#D9A566" 
                 radius={[4, 4, 0, 0]}
                 animationDuration={1500}

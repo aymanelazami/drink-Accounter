@@ -127,4 +127,39 @@
   .dark .subtle-shadow {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
+
+  /* Custom scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  /* Mobile-specific optimizations */
+  @media (max-width: 640px) {
+    :root {
+      --radius: 0.75rem;
+    }
+    
+    body {
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Slightly smaller components on mobile */
+    .glass {
+      @apply bg-white/80;
+    }
+  }
 }
